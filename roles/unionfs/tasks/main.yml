@@ -44,6 +44,7 @@
       - /mnt/unionfs/Media
       - /mnt/unionfs/Media/Movies
       - /mnt/unionfs/Media/TV
+      - /mnt/unionfs/Comics
 
   - name: Start unionfs service
     systemd: state=started name=unionfs daemon_reload=yes enabled=yes

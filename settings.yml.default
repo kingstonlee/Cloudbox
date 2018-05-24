@@ -4,11 +4,12 @@ passwd: password123
 domain: testcloudbox.ml
 email: your@email.com
 cloudflare_api_token:
+base_downloads: /mnt/local/downloads
 nzbget:
-  downloads: /mnt/local/downloads/nzbget
+  downloads: {{base_downloads}}/nzbget
 rutorrent:
   passwd: password321
-  downloads: /mnt/local/downloads/rutorrent
+  downloads: {{base_downloads}}/rutorrent
 plex:
   tag: public
   transcodes: /home/{{user}}/transcodes

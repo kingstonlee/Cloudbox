@@ -1,0 +1,65 @@
+#########################################################################
+# Title:         Cloudbox: Lidarr Role                                  #
+# Author(s):     l3uddz                                                 #
+# URL:           https://github.com/Cloudbox/Cloudbox                   #
+# Docker Image:  hotio/suitarr                                          #
+# --                                                                    #
+#         Part of the Cloudbox project: https://cloudbox.rocks          #
+#########################################################################
+#                   GNU General Public License v3.0                     #
+#########################################################################
+---
+- name: "Setting CloudFlare DNS Record"
+  include_role:
+    name: cloudflare
+  vars:
+    subdomain: mylar
+
+- name: "Get {{user}} uid"
+  shell: "id -u {{user}}"
+  register: uid
+
+- name: "Get {{user}} gid"
+  shell: "id -g {{user}}"
+  register: gid
+
+- name: Stop and remove any existing container
+  docker_container:
+    name: mylar
+    state: absent
+
+- name: Create lidarr directories
+  file: "path={{item}} state=directory mode=0775 owner={{user}} group={{user}}"
+  with_items:
+    - /opt/mylar
+    - /mnt/local/Media/Comics
+
+- name: Create and start container
+  docker_container:
+    name: mylar
+    image: linuxserver/mylar
+    pull: yes
+    published_ports:
+      - "127.0.0.1:8090:8090"
+    env:
+      PUID: "{{uid.stdout}}"
+      PGID: "{{gid.stdout}}"
+      VIRTUAL_HOST: "mylar.{{domain}}"
+      VIRTUAL_PORT: 8090
+      LETSENCRYPT_HOST: "mylar.{{domain}}"
+      LETSENCRYPT_EMAIL: "{{email}}"
+    volumes:
+      - "/etc/localtime:/etc/localtime:ro"
+      - "/opt/mylar:/config"
+      - "/mnt/unionfs/Media/Comics:/comics"
+      - "{{base_downloads}}"
+      - "{{nzbget.downloads}}:/downloads/nzbget"
+      - "{{rutorrent.downloads}}:/downloads/rutorrent"
+      - "/mnt:/mnt"
+      - "/opt/scripts:/scripts"
+    networks:
+      - name: cloudbox
+        aliases:
+          - mylar
+    restart_policy: always
+    state: started
