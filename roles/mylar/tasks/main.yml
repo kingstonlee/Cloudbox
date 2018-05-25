@@ -1,8 +1,8 @@
 #########################################################################
-# Title:         Cloudbox: Lidarr Role                                  #
-# Author(s):     l3uddz                                                 #
+# Title:         Cloudbox: Mylar Role                                   #
+# Author(s):     kingston-lee                                           #
 # URL:           https://github.com/Cloudbox/Cloudbox                   #
-# Docker Image:  hotio/suitarr                                          #
+# Docker Image:  linuxserver/mylar                                      #
 # --                                                                    #
 #         Part of the Cloudbox project: https://cloudbox.rocks          #
 #########################################################################
@@ -28,7 +28,7 @@
     name: mylar
     state: absent
 
-- name: Create lidarr directories
+- name: Create mylar directories
   file: "path={{item}} state=directory mode=0775 owner={{user}} group={{user}}"
   with_items:
     - /opt/mylar
