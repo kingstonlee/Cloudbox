@@ -56,7 +56,7 @@
       - "/mnt/unionfs/Media/Audiobooks:/audiobooks"
       - "/mnt/unionfs/Media/Books:/books"
       - "/mnt/unionfs/Media/Magazines:/magazines"
-      - "{{base_downloads}}":/downloads
+      - "{{base_downloads}}:/downloads"
       - "{{nzbget.downloads}}:/downloads/nzbget"
       - "{{rutorrent.downloads}}:/downloads/rutorrent"
       - "/mnt:/mnt"
