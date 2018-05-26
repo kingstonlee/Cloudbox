@@ -49,3 +49,4 @@
     - { role: quassel, tags: ['install-quassel', 'update-quassel'] }
     - { role: plex_patrol, tags: ['install-plex_patrol', 'update-plex_patrol'] }
     - { role: mylar, tags: ['install-mylar', 'update-mylar'] }
+    - { role: lazylibrarian, tags: ['install-lazylibrarian', 'update-lazylibrarian'] }

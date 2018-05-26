@@ -1,0 +1,69 @@
+#########################################################################
+# Title:         Cloudbox: LazyLibrarian Role                           #
+# Author(s):     l3uddz                                                 #
+# URL:           https://github.com/Cloudbox/Cloudbox                   #
+# Docker Image:  hotio/suitarr                                          #
+# --                                                                    #
+#         Part of the Cloudbox project: https://cloudbox.rocks          #
+#########################################################################
+#                   GNU General Public License v3.0                     #
+#########################################################################
+---
+- name: "Setting CloudFlare DNS Record"
+  include_role:
+    name: cloudflare
+  vars:
+    subdomain: lazylibrarian
+
+- name: "Get {{user}} uid"
+  shell: "id -u {{user}}"
+  register: uid
+
+- name: "Get {{user}} gid"
+  shell: "id -g {{user}}"
+  register: gid
+
+- name: Stop and remove any existing container
+  docker_container:
+    name: lazylibrarian
+    state: absent
+
+- name: Create lazylibrarian directories
+  file: "path={{item}} state=directory mode=0775 owner={{user}} group={{user}}"
+  with_items:
+    - /opt/lazylibrarian
+    - /mnt/local/Media/Audiobooks
+    - /mnt/local/Media/Books
+    - /mnt/local/Media/Magazines
+
+- name: Create and start container
+  docker_container:
+    name: lazylibrarian
+    image: thraxis/lazylibrarian-calibre
+    pull: yes
+    published_ports:
+      - "127.0.0.1:5299:5299"
+    env:
+      PUID: "{{uid.stdout}}"
+      PGID: "{{gid.stdout}}"
+      VIRTUAL_HOST: "lazylibrarian.{{domain}}"
+      VIRTUAL_PORT: 5299
+      LETSENCRYPT_HOST: "lazylibrarian.{{domain}}"
+      LETSENCRYPT_EMAIL: "{{email}}"
+    volumes:
+      - "/etc/localtime:/etc/localtime:ro"
+      - "/opt/lazylibrarian:/config"
+      - "/mnt/unionfs/Media/Audiobooks:/audiobooks"
+      - "/mnt/unionfs/Media/Books:/books"
+      - "/mnt/unionfs/Media/Magazines:/magazines"
+      - "{{base_downloads}}":/downloads
+      - "{{nzbget.downloads}}:/downloads/nzbget"
+      - "{{rutorrent.downloads}}:/downloads/rutorrent"
+      - "/mnt:/mnt"
+      - "/opt/scripts:/scripts"
+    networks:
+      - name: cloudbox
+        aliases:
+          - lazylibrarian
+    restart_policy: always
+    state: started
