@@ -37,21 +37,21 @@
 - name: Create and start container
   docker_container:
     name: calibre
-    image: regueiro/calibre-server
+    image: linuxserver/calibre-web/
     pull: yes
     published_ports:
-      - "127.0.0.1:8484:8080"
+      - "127.0.0.1:8083:8083"
     env:
       PUID: "{{uid.stdout}}"
       PGID: "{{gid.stdout}}"
       VIRTUAL_HOST: "calibre.{{domain}}"
-      VIRTUAL_PORT: 8080
+      VIRTUAL_PORT: 8083
       LETSENCRYPT_HOST: "calibre.{{domain}}"
       LETSENCRYPT_EMAIL: "{{email}}"
     volumes:
       - "/etc/localtime:/etc/localtime:ro"
       - "/opt/calibre:/config"
-      - "/mnt/unionfs/Media/Books:/opt/calibre/library"
+      - "/mnt/unionfs/Media/Books:/books"
       - "/mnt:/mnt"
     networks:
       - name: cloudbox
